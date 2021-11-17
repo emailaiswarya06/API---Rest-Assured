@@ -82,6 +82,17 @@ public class GetStationDataOn15thApril {
     }
 
     @Test
+    public void testGetStationDataOn15thAprilAndValidateResponseBodyForXMLResponse(){
+        given().
+                spec(requestSpec).
+                when().
+                get("route.aspx?cmd=routes&key=MW9S-E7SL-26DU-VV8V").
+                then().
+                assertThat().
+                body("root.routes.route[1].name", equalTo("Coliseum to Oakland Airport"));
+    }
+
+    @Test
     public void testGetStationDataOn15thAprilAndPrintAndValidateName(){
         String name =
         given().
