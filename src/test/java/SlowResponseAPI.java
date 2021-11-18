@@ -1,7 +1,3 @@
-import io.qameta.allure.Description;
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import io.restassured.RestAssured;
 import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -12,13 +8,9 @@ import org.junit.Test;
 import static io.restassured.RestAssured.given;
 
 
-@Epic("Login Tests Epic")
-@Feature("Login Tests Epic")
 public class SlowResponseAPI {
 
     @Test
-    @Story("Login Tests Epic")
-    @Description("Login Tests Epic")
     public void testGetListOfUsersAndPrintResponseBody() {
 
         RestAssured.config= RestAssuredConfig.config()
@@ -35,8 +27,6 @@ public class SlowResponseAPI {
     }
 
     @Test
-    @Story("Login Tests Epic")
-    @Description("Login Tests Epic")
     public void testGetListsersAndPrintResponseBody() {
 
         try{
