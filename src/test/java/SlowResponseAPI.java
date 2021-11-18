@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 public class SlowResponseAPI {
 
     @Test
-    public void testGetListOfUsersAndPrintResponseBody() {
+    public void testAddTimeOutOnASlowResponseAPI() {
 
         RestAssured.config= RestAssuredConfig.config()
                 .httpClient(HttpClientConfig.httpClientConfig()
@@ -27,7 +27,7 @@ public class SlowResponseAPI {
     }
 
     @Test
-    public void testGetListsersAndPrintResponseBody() {
+    public void testAddExceptionHandlingOnTimeOutAPI() {
 
         try{
                 given().
