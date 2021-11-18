@@ -1,4 +1,3 @@
-import dataentities.PageDetails;
 import dataentities.UserDetails;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
