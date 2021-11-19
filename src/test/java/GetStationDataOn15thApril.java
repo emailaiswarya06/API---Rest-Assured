@@ -1,12 +1,4 @@
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.builder.ResponseSpecBuilder;
-import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.ResponseSpecification;
-import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.hamcrest.Matchers.*;
 
 import static io.restassured.RestAssured.given;
 
