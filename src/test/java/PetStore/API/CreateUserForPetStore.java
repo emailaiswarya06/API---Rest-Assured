@@ -2,86 +2,171 @@ package PetStore.API;
 
 import PetStore.Model.UserCreateForPetRequestModel;
 import PetStore.Model.UserCreateForPetResponseModel;
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.DataProviderRunner;
+import com.tngtech.java.junit.dataprovider.UseDataProvider;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.*;
-
 import static io.restassured.RestAssured.given;
 
+
+@RunWith(DataProviderRunner.class)
 public class CreateUserForPetStore {
 
-    @Test
-    public void shouldCreateUserForPetStore(){
+    static String baseUrl = "https://petstore.swagger.io/v2";
+    static String userPath = "/user";
+    static String userAllPath = "/user/createWithArray";
 
-//        String userRequestBody ="{\n" +
-//                "  \"id\": 101,\n" +
-//                "  \"username\": \"jackson\",\n" +
-//                "  \"firstName\": \"Jackson\",\n" +
-//                "  \"lastName\": \"Collins\",\n" +
-//                "  \"email\": \"jakson.collins@gmail.com\",\n" +
-//                "  \"password\": \"petLover\",\n" +
-//                "  \"phone\": \"901601601\",\n" +
-//                "  \"userStatus\": 0\n" +
-//                "}";
+     static RequestSpecification requestSpec;
 
-        UserCreateForPetRequestModel userPetStoreRequestBody = new UserCreateForPetRequestModel();
-        userPetStoreRequestBody.setId(101);
-        userPetStoreRequestBody.setUsername("jacksonThePetLover");
-        userPetStoreRequestBody.setFirstName("Jackson");userPetStoreRequestBody.setLastName("Collins");
-        userPetStoreRequestBody.setEmail("jakson.collins@gmail.com");userPetStoreRequestBody.setPassword("petLover");
-        userPetStoreRequestBody.setPhone("901601601");userPetStoreRequestBody.setUserStatus(1);
 
-        given().
-                contentType(ContentType.JSON).body(userPetStoreRequestBody).
-                when().
-                post("https://petstore.swagger.io/v2/user").
-                then().
-                assertThat().statusCode(200);
+    @DataProvider
+    public static Object[] requestUserPayload(){
+
+        UserCreateForPetRequestModel requestUser = new UserCreateForPetRequestModel(101,"jacksonThePetLover","Jackson","Collins",
+                "jakson.collins@gmail.com","petLover","9016016011",1);
+        return new Object[]{requestUser};
+    }
+
+
+    @DataProvider
+    public static Object[] requestUserAllPayload(){
+        List<UserCreateForPetRequestModel> requestUserAll = new ArrayList<>();
+
+        UserCreateForPetRequestModel user1 = new UserCreateForPetRequestModel(1110,"PeterForPets","Peter","Parker",
+                "peter.parker@gmail.com","PeterForPets","9016527676",1);
+
+        UserCreateForPetRequestModel user2 = new UserCreateForPetRequestModel(2220,"AmyLovesCats","Amy","Williams",
+                "amy.williams@gmail.com","AmyLovesCats","9016011122",0);
+        requestUserAll.add(user1);
+        requestUserAll.add(user2);
+
+        return new Object[]{requestUserAll};
+
 
     }
+
+    @BeforeClass
+    public static void createRequestSpecification(){
+        requestSpec = new RequestSpecBuilder().
+                setBaseUri(baseUrl).
+                build();
+
+    }
+
+    @Test
+    @UseDataProvider("requestUserPayload")
+    public void shouldCreateUserForPetStoreAndPrint(UserCreateForPetRequestModel requestUser){
+
+        Response response = given().
+                spec(requestSpec).contentType(ContentType.JSON).body(requestUser).
+                when().
+                post(userPath).
+                then().assertThat().statusCode(200).and().extract().response();
+
+        System.out.println("Details of the user created :" + response.asString());
+
+    }
+
+
+
+
     // serialization - array of pet store users and deserialization to extract the response and print
     @Test
-    public void shouldCreateArrayOfUsersForPetStore(){
-        /*
-      List<UserArrayCreateForPetStoreRequestModel> userAll=new ArrayList<>();
+    @UseDataProvider("requestUserAllPayload")
+    public void shouldCreateArrayOfUsersForPetStore(List userCreationArray){
 
-        //User1
-        UserArrayCreateForPetStoreRequestModel userArrayRequest1 = new UserArrayCreateForPetStoreRequestModel();
-        userArrayRequest1.setUserArray(Arrays.asList(111,"PeterForPets","Peter","Parker","peter.parker@gmail.com","PeterForPets","9016527676",1));
-
-        //User 2
-        UserArrayCreateForPetStoreRequestModel userArrayRequest2 = new UserArrayCreateForPetStoreRequestModel();
-        userArrayRequest2.setUserArray(Arrays.asList(222,"AmyLovesCats","Amy","Williams","amy.williams@gmail.com","AmyLovesCats","9016011122",0));
-*/
-        List<UserCreateForPetRequestModel> userArray = new ArrayList<>();
-        UserCreateForPetRequestModel user1 = new UserCreateForPetRequestModel();
-        user1.setId(111);
-        user1.setUsername("PeterForPets");
-        user1.setFirstName("Peter");user1.setLastName("Parker");
-        user1.setEmail("peter.parker@gmail.com");user1.setPassword("PeterForPets");
-        user1.setPhone("9016527676");user1.setUserStatus(1);
-        userArray.add(user1);
-
-
-        UserCreateForPetRequestModel user2 = new UserCreateForPetRequestModel();
-        user2.setId(222);
-        user2.setUsername("AmyLovesCats");
-        user2.setFirstName("Amy");user2.setLastName("Williams");
-        user2.setEmail("amy.williams@gmail.com");user2.setPassword("AmyLovesCats");
-        user2.setPhone("9016011122");user2.setUserStatus(0);
-
-        userArray.add(user2);
 
         UserCreateForPetResponseModel userAllResponseBody =
-                given().
-                        contentType(ContentType.JSON).body(userArray).
+                given().spec(requestSpec).
+                        contentType(ContentType.JSON).body(userCreationArray).
                         when().
-                        post("https://petstore.swagger.io/v2/user/createWithArray").as(UserCreateForPetResponseModel.class);
+                        post(userAllPath).as(UserCreateForPetResponseModel.class);
 
         System.out.println(userAllResponseBody.toString());
 
         Assert.assertEquals(200,userAllResponseBody.getCode());
     }
+
+
+
+
+    @Test
+    @UseDataProvider("requestUserPayload")
+    public void testUserCreated(UserCreateForPetRequestModel requestUser){
+
+        String userName = requestUser.getUsername();
+
+        System.out.println("User Name :" + userName);
+        given().spec(requestSpec).when().get(userPath+"/"+userName).then().assertThat().statusCode(200);
+    }
+
+
+    @Test
+    @UseDataProvider("requestUserPayload")
+    public void testInvalidURL(UserCreateForPetRequestModel requestUser) {
+
+        given().
+                contentType(ContentType.JSON).
+                body(requestUser).
+                log().
+                body().
+                when().
+                post("https://petstore.swagger.io/xyz/user").
+                then().assertThat().statusCode(404);
+    }
+
+    @Test
+    public void testInvalidJsonBody() {
+
+        String jsonBody = "{\n" +
+                "  \"id\": \"id\",\n" +
+                "  \"username\": \"string\",\n" +
+                "  \"firstName\": \"string\",\n" +
+                "  \"lastName\": \"string\",\n" +
+                "  \"email\": \"string\",\n" +
+                "  \"password\": \"string\",\n" +
+                "  \"phone\": \"string\",\n" +
+                "  \"userStatus\": \"userStatus\"\n" +
+                "}";
+
+        given().
+                spec(requestSpec).contentType(ContentType.JSON).body(jsonBody).
+                when().
+                post(userPath).
+                then().assertThat().statusCode(500);
+
+    }
+        @Test
+        public void testInvalidContentType(){
+
+            String jsonBodyInvalidContent ="{\n" +
+                    "  \"id\": 701,\n" +
+                    "  \"username\": \"abc\",\n" +
+                    "  \"firstName\": \"abc\",\n" +
+                    "  \"lastName\": \"abc\",\n" +
+                    "  \"email\": \"abc\",\n" +
+                    "  \"password\": \"abc\",\n" +
+                    "  \"phone\": \"abc\",\n" +
+                    "  \"userStatus\": 0\n" +
+                    "}";
+
+            given().
+                    spec(requestSpec).contentType(ContentType.XML).body(jsonBodyInvalidContent).
+                    when().
+                    post(userPath).
+                    then().assertThat().statusCode(400);
+
+    }
+
+
 }
